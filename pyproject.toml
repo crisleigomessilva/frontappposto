@@ -1,0 +1,35 @@
+[tool.poetry]
+name = "frontappposto"
+version = "0.1.0"
+description = ""
+authors = ["crisleigomessilva <crislei@sousys.com.br>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.13"
+flet = "^0.25.2"
+httpx = "^0.28.1"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.4"
+black = "^24.10.0"
+flake8 = "^7.1.1"
+watchdog = "^6.0.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.poetry.scripts]
+run = "frontappposto.main:main"
+
+
+[tool.black]
+line-length = 78
+
+
+
+

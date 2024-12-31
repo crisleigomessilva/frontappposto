@@ -1,0 +1,5 @@
+{
+  "api_base_url": "http://217.77.0.239:8081",
+  "login_endpoint": "/auth/login",
+  "densidade_endpoint": "/densidade/buscar_densidade_corrigida"
+}
