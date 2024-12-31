@@ -1,9 +1,28 @@
 import flet as ft
 import httpx
 import asyncio
+import json
+import os
 
-API_BASE_URL = "http://217.77.0.239:8081"
-LOGIN_ENDPOINT = "/auth/login"
+# Carregar as configurações do config.json
+CONFIG_PATH = os.path.join(os.path.dirname(__file__), '..', 'config.json')
+
+
+def load_config():
+    try:
+        with open(CONFIG_PATH, 'r') as config_file:
+            return json.load(config_file)
+    except FileNotFoundError:
+        print(f"Erro: O arquivo {CONFIG_PATH} não foi encontrado.")
+        return None
+    except json.JSONDecodeError:
+        print(f"Erro: Falha ao decodificar o JSON em {CONFIG_PATH}.")
+        return None
+
+# Carregue as configurações na inicialização
+config = load_config()
+if not config:
+    raise Exception("Erro ao carregar o arquivo de configuração. Verifique o config.json.")
 
 # Variável global para armazenar o token JWT
 jwt_token = None
@@ -34,12 +53,20 @@ def main(page: ft.Page):
     async def authenticate_user(email, password):
         try:
             async with httpx.AsyncClient() as client:
-                url = f"{API_BASE_URL}{LOGIN_ENDPOINT}"
+                # Usar os valores do config.json
+                api_base_url = config.get("api_base_url")
+                login_endpoint = config.get("login_endpoint")
+                
+                if not api_base_url or not login_endpoint:
+                    raise ValueError("Configuração inválida. Verifique api_base_url e login_endpoint no config.json.")
+
+                url = f"{api_base_url}{login_endpoint}"
                 params = {"email": email, "password": password}
 
                 print(f"Enviando requisição para: {url}")
                 print(f"Query Parameters: {params}")
 
+                # Envia os dados como query parameters
                 response = await client.post(url, params=params)
                 response.raise_for_status()
                 return {"success": True, "data": response.json()}
@@ -52,6 +79,8 @@ def main(page: ft.Page):
                 return {"success": False, "error": f"Erro HTTP: {exc.response.status_code}"}
         except httpx.RequestError as exc:
             return {"success": False, "error": f"Erro de conexão: {exc}"}
+        except ValueError as exc:
+            return {"success": False, "error": str(exc)}
 
     async def handle_login():
         email = email_field.value.strip()
